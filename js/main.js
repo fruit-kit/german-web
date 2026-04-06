@@ -17,65 +17,29 @@ const checkAnswers = (formId) => {
     let rightAnswers = 0;
 
     questions.forEach((question) => {
-        const labels = question.querySelectorAll('label');
-        labels.forEach((label) => {
+        question.querySelectorAll('label').forEach((label) => {
             label.innerHTML = label.innerHTML.replace('✅', '').replace('❌', '');
         });
-    });
 
-    selectedAnswers.forEach((answer) => {
-        const question = answer.closest('.question');
-        const labels = question.querySelectorAll('label');
+        const selectedAnswer = question.querySelector('input[type="radio"]:checked');
+        const selectedLabel = question.querySelector(`label[for="${selectedAnswer.id}"]`);
+        const correctAnswer = question.querySelector('input[value="right"]');
+        const correctLabel = question.querySelector(`label[for="${correctAnswer.id}"]`);
 
-        // Найдем правильный ответ
-        labels.forEach((label) => {
-            if (label.getAttribute('for') === answer.id) {
-                if (answer.value === 'right') {
-                    label.innerHTML += ' ✅';
-                    rightAnswers++;
-                } else {
-                    label.innerHTML += ' ❌';
-                }
-            }
-
-            const correctAnswer = question.querySelector('input[value="right"]');
-            const correctLabel = question.querySelector(`label[for="${correctAnswer.id}"]`);
-            if (correctLabel && !correctLabel.innerHTML.includes('✅')) {
-                correctLabel.innerHTML += ' ✅';
-            }
-        });
+        if (selectedAnswer.value === 'right') {
+            selectedLabel.innerHTML += ' ✅';
+            rightAnswers++;
+        } else {
+            selectedLabel.innerHTML += ' ❌';
+            correctLabel.innerHTML += ' ✅';
+        }
     });
 
     const resultElement = document.getElementById('result');
     const rightAnswersInPercent = (rightAnswers / questions.length) * 100;
     resultElement.textContent = `Правильних відповідей: ${rightAnswersInPercent.toFixed(0)}%`;
 
-    const allRadios = form.querySelectorAll('input[type="radio"]');
-    allRadios.forEach(radio => {
+    form.querySelectorAll('input[type="radio"]').forEach((radio) => {
         radio.disabled = true;
     });
-}
-
-const resetAnswers = (formId) => {
-    const form = document.getElementById(formId);
-
-    form.reset();
-
-    const questions = form.querySelectorAll('.question');
-    questions.forEach((question) => {
-        const labels = question.querySelectorAll('label');
-        labels.forEach((label) => {
-            label.innerHTML = label.innerHTML.replace('✅', '').replace('❌', '');
-        });
-    });
-
-    const warningAlert = document.getElementById('warning-alert');
-    const result = document.getElementById('result');
-    warningAlert.classList.add('d-none');
-    result.classList.add('d-none');
-
-    const allRadios = form.querySelectorAll('input[type="radio"]');
-    allRadios.forEach(radio => {
-        radio.disabled = false;
-    });
-}
+};
